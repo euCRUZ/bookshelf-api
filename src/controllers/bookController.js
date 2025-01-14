@@ -3,32 +3,33 @@ import book from "../models/Book.js"
 
 export default class BookController {
   // GET
-  static async getBooks(req, res) {
+  static async getBooks(req, res, next) {
     try {
       const booksList = await book.find({})
       res.status(200).json(booksList) // Complex Data, use JSON
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error getting books", error: error.message })
+      next(error)
     }
   }
 
   // FILTER BY ID
-  static async getBookByID(req, res) {
+  static async getBookByID(req, res, next) {
     try {
       const id = req.params.id
       const findedBook = await book.findById(id)
-      res.status(200).json(findedBook) // Complex Data, use JSON
+
+      if (findedBook !== null) {
+        res.status(200).json(findedBook) // Complex Data, use JSON
+      } else {
+        res.status(400).json({ message: "Book not founded" }) // Complex Data,
+      }
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error getting the book", error: error.message })
+      next(error)
     }
   }
 
   // POST
-  static async registerBook(req, res) {
+  static async registerBook(req, res, next) {
     const newBook = req.body
 
     try {
@@ -37,48 +38,40 @@ export default class BookController {
       const createdBook = await book.create(completeBook)
       res.status(201).json({ message: "Book registered", Book: createdBook })
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error registering book", error: error.message })
+      next(error)
     }
   }
 
   // PUT
-  static async updateBook(req, res) {
+  static async updateBook(req, res, next) {
     try {
       const id = req.params.id
       await book.findByIdAndUpdate(id, req.body)
       res.status(200).json({ message: "Book updated!" }) // Complex Data, use JSON
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error in the update", error: error.message })
+      next(error)
     }
   }
 
   // DELETE
-  static async deleteBook(req, res) {
+  static async deleteBook(req, res, next) {
     try {
       const id = req.params.id
       await book.findByIdAndDelete(id)
       res.status(200).json({ message: "Book deleted!" }) // Complex Data, use JSON
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error deleting book", error: error.message })
+      next(error)
     }
   }
 
-  static async listBooksByPublisher(req, res) {
+  static async listBooksByPublisher(req, res, next) {
     const publisher = req.query.publisher
 
     try {
       const booksByPublisher = await book.find({ publisher: publisher })
       res.status(200).json(booksByPublisher)
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error getting books", error: error.message })
+      next(error)
     }
   }
 }

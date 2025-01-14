@@ -7,7 +7,7 @@ const authorSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      required: true,
+      required: [true, "Author name is required"], // Custom Error Message from Mongoose
     },
     nationality: {
       type: String,
