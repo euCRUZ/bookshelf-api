@@ -1,12 +1,20 @@
 import NotFound from "../errors/notFound.js"
-import { author } from "../models/Author.js"
-import book from "../models/Book.js"
+import { author } from "../models/index.js"
+import { book } from "../models/index.js"
 
 export default class BookController {
   // GET
   static async getBooks(req, res, next) {
     try {
-      const booksList = await book.find({})
+      let { limit = 5, page = 1 } = req.query
+
+
+
+      const booksList = await book
+        .find({})
+        .skip((page - 1) * limit)
+        .limit(Number(limit))
+
       res.status(200).json(booksList) // Complex Data, use JSON
     } catch (error) {
       next(error)
@@ -75,12 +83,27 @@ export default class BookController {
     }
   }
 
-  static async listBooksByPublisher(req, res, next) {
-    const publisher = req.query.publisher
-
+  static async listBooksByFilter(req, res, next) {
     try {
-      const booksByPublisher = await book.find({ publisher: publisher })
-      res.status(200).json(booksByPublisher)
+      const { title, publisher, auhtorName } = req.query
+
+      const search = {}
+
+      if (publisher) {
+        search.publisher = { $regex: publisher, $options: "i" }
+      }
+      if (title) {
+        search.title = { $regex: title, $options: "i" }
+      }
+      if (auhtorName) {
+        const author = await author.findOne({ name: auhtorName })
+        const authorID = author._id
+
+        search.author = authorID
+      }
+
+      const booksByFilter = await book.find(search)
+      res.status(200).json(booksByFilter)
     } catch (error) {
       next(error)
     }

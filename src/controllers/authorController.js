@@ -1,5 +1,5 @@
 import NotFound from "../errors/notFound.js"
-import { author } from "../models/Author.js"
+import { author } from "../models/index.js"
 
 export default class AuthorController {
   // GET
