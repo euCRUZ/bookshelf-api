@@ -1,7 +1,7 @@
+import NotFound from "../errors/notFound.js"
 import { author } from "../models/Author.js"
 
 export default class AuthorController {
-  
   // GET
   static async getAuthors(req, res, next) {
     try {
@@ -21,7 +21,7 @@ export default class AuthorController {
       if (findedAuthor !== null) {
         res.status(200).json(findedAuthor) // Complex Data, use JSON
       } else {
-        res.status(400).json({ message: "Author not founded" }) // Complex Data,
+        next(new NotFound("Author not founded"))
       }
     } catch (error) {
       next(error)
@@ -42,8 +42,13 @@ export default class AuthorController {
   static async updateAuthor(req, res, next) {
     try {
       const id = req.params.id
-      await author.findByIdAndUpdate(id, req.body)
-      res.status(200).json({ message: "Author updated!" }) // Complex Data, use JSON
+      const auhtorResult = await author.findByIdAndUpdate(id, req.body)
+
+      if (auhtorResult !== null) {
+        res.status(200).json({ message: "Author updated!" }) // Complex Data, use JSON
+      } else {
+        next(new NotFound("Author not founded"))
+      }
     } catch (error) {
       next(error)
     }
@@ -53,8 +58,13 @@ export default class AuthorController {
   static async deleteAuthor(req, res, next) {
     try {
       const id = req.params.id
-      await author.findByIdAndDelete(id)
-      res.status(200).json({ message: "Author deleted!" }) // Complex Data, use JSON
+      const authorResult = await author.findByIdAndDelete(id)
+
+      if (authorResult !== null) {
+        res.status(200).json({ message: "Author deleted!" }) // Complex Data, use JSON
+      } else {
+        next(new NotFound("Author not founded"))
+      }
     } catch (error) {
       next(error)
     }

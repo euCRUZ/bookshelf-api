@@ -1,3 +1,4 @@
+import NotFound from "../errors/notFound.js"
 import { author } from "../models/Author.js"
 import book from "../models/Book.js"
 
@@ -21,7 +22,7 @@ export default class BookController {
       if (findedBook !== null) {
         res.status(200).json(findedBook) // Complex Data, use JSON
       } else {
-        res.status(400).json({ message: "Book not founded" }) // Complex Data,
+        next(new NotFound("Book not founded"))
       }
     } catch (error) {
       next(error)
@@ -46,8 +47,13 @@ export default class BookController {
   static async updateBook(req, res, next) {
     try {
       const id = req.params.id
-      await book.findByIdAndUpdate(id, req.body)
-      res.status(200).json({ message: "Book updated!" }) // Complex Data, use JSON
+      const bookResult = await book.findByIdAndUpdate(id, req.body)
+
+      if (bookResult !== null) {
+        res.status(200).json({ message: "Book updated!" }) // Complex Data, use JSON
+      } else {
+        next(new NotFound("Book not founded"))
+      }
     } catch (error) {
       next(error)
     }
@@ -57,8 +63,13 @@ export default class BookController {
   static async deleteBook(req, res, next) {
     try {
       const id = req.params.id
-      await book.findByIdAndDelete(id)
-      res.status(200).json({ message: "Book deleted!" }) // Complex Data, use JSON
+      const bookResult = await book.findByIdAndDelete(id)
+
+      if (bookResult !== null) {
+        res.status(200).json({ message: "Book deleted!" }) // Complex Data, use JSON
+      } else {
+        next(new NotFound("Book not founded"))
+      }
     } catch (error) {
       next(error)
     }

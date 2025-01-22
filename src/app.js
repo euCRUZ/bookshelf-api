@@ -2,6 +2,7 @@ import express from "express"
 import dbConnect from "./config/dbConnect.js"
 import routes from "./routes/index.js"
 import errorManipulator from "./middlewares/errorManipulator.js"
+import manipulator404 from "./middlewares/manipulator404.js"
 
 const connection = await dbConnect()
 
@@ -15,6 +16,8 @@ connection.once("open", () => {
 
 const app = express()
 routes(app)
+
+app.use(manipulator404)
 
 app.use(errorManipulator)
 
